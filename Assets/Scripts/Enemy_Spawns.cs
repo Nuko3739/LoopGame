@@ -19,8 +19,8 @@ public class Enemy_Spawns : MonoBehaviour
 
         // 生成位置をランダムで決定
         Vector2 spawnPosition = new Vector2(
-            Random.Range(SpawnArea.bounds.min.x, SpawnArea.bounds.max.x),
-            Random.Range(SpawnArea.bounds.min.y, SpawnArea.bounds.max.y)
+            Random.Range(SpawnArea.bounds.min.x, SpawnArea.bounds.max.x),//横軸をランダム設定
+            Random.Range(SpawnArea.bounds.min.y, SpawnArea.bounds.max.y)// 縦軸をランダム設定
         );
 
         // Enemyをランダムに選択して生成

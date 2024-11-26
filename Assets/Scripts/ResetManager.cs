@@ -5,6 +5,7 @@ using UnityEngine;
 public class ResetManager : MonoBehaviour
 {
     [Header("ループ処理関連")]
+    public ScoreManager ScoreManager; // ScoreManagerへの参照（Inspectorで設定）
     public Transform RestartPosition; // プレイヤーを戻す位置
     public string PlayerTag = "Player"; // プレイヤーのタグ
 
@@ -48,7 +49,11 @@ public class ResetManager : MonoBehaviour
     {
         // フェードアウト処理（仮）
         //現在はコルーチンで待機、この待ってる時間は敵の動きを止めることを忘れずに
+        //　　　　　　　　　　　　時間停止はまだ未実装↑
         yield return StartCoroutine(FadeOut());
+
+        // タイムボーナスをスコアに加算
+        ScoreManager.AddTimeBonus();
 
         // プレイヤーをリスタート位置に移動
         if (RestartPosition != null)
@@ -60,6 +65,9 @@ public class ResetManager : MonoBehaviour
         {
             Debug.LogError("RestartPositionが設定されていないため、プレイヤーを移動できませんでした。");
         }
+
+        // タイマーリセット
+        ScoreManager.ResetTimer();
         // Enemy生成処理
         SpawnNewEnemies();
     }
@@ -105,6 +113,8 @@ public class ResetManager : MonoBehaviour
 
             // Enemyを生成してリストに追加
             GameObject newEnemy = Instantiate(RandomEnemyPrefab, spawnPosition, Quaternion.identity);
+            //Quaternion.identityは用途: オブジェクト生成時に特定の回転を設定。でこの場合は回転を適用しない
+
             SpawnedEnemies.Add(newEnemy);
 
             Debug.Log($"Enemy生成: {newEnemy.name} at {spawnPosition}");

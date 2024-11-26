@@ -85,63 +85,16 @@ public class Player : MonoBehaviour
         }
 
 
-        ////攻撃処理
-        //if(Input.GetKeyDown(KeyCode.J) && isCanAttack)　//Jキーで攻撃（仮）
-        //{
-        //    StartCoroutine(Attack());
-        //}
+       
     }
 
-    ////攻撃処理
-    //private IEnumerator Attack()
-    //{
-    //    isCanAttack = false; // 攻撃フラグをfalseにしてクールダウン期間中は再度攻撃できないようにする
-    //    //アニメーターにトリガーをセット
-    //    animator.SetTrigger("AttackTrigger");
 
-
-    //    ////コルーチンで攻撃判定を0.1秒だけ有効にする
-    //    //StartCoroutine(EnableAttackCollider());
-    //    //StartCoroutine(AttackCooldownCoroutine()); // 攻撃のクールダウンを開始
-
-    //    // 0.2秒待機してから攻撃判定を有効にする
-    //    yield return new WaitForSeconds(0.2f);
-    //    StartCoroutine(EnableAttackCollider());
-
-
-    //    // 攻撃のクールダウンを開始
-    //    yield return StartCoroutine(AttackCooldownCoroutine()); // クールダウンの完了を待つ
-    //    isCanAttack = true;//クールダウン終了後に再度攻撃可能にする
-    //}
-
-    ////攻撃処理のコルーチンなど
-    //private IEnumerator EnableAttackCollider()
-    //{
-    //    AttackCollider.enabled = true; //攻撃コライダーを有効にする
-    //    yield return new WaitForSeconds(0.1f); //0.1秒待機(攻撃判定時間）
-    //    AttackCollider.enabled = false; //攻撃コライダーを無効にする
-    //}
-
-    //// 攻撃のクールダウン処理
-    //private IEnumerator AttackCooldownCoroutine()
-    //{
-    //    yield return new WaitForSeconds(AttackCooldown); // クールダウン時間待機
-    //    isCanAttack = true; // クールダウン終了後に再度攻撃可能にする
-    //}
-    //// プレイヤーがダメージを受けた際に赤く光るコルーチン
-    //private IEnumerator FlashDamage()
-    //{
-    //    spriteRenderer.color = Color.red;  // 赤く光る
-    //    yield return new WaitForSeconds(0.1f);  // 0.1秒待機
-    //    spriteRenderer.color = Color.white;  // 元の色に戻す
-    //}
-
-    // 無敵状態の間、プレイヤーが赤く点滅するコルーチン
+    // 無敵状態の間、プレイヤーが点滅するコルーチン
     private IEnumerator InvincibleBlinkCoroutine()
     {
         while (isInvincible)
         {
-            spriteRenderer.color = Color.red; // 赤く光る
+            spriteRenderer.color = Color.clear; // 透明（白く消える）
             yield return new WaitForSeconds(BlinkInterval);
             spriteRenderer.color = Color.white; // 元の色に戻す
             yield return new WaitForSeconds(BlinkInterval);
@@ -249,23 +202,6 @@ public class Player : MonoBehaviour
             isGround = false;
         }
     }
-
-    ////Enemy攻撃処理
-    //private void OnTriggerEnter2D(Collider2D Collision)
-    //{
-    //    // AttackCollider が有効で、衝突したオブジェクトが "Enemy" タグを持っている場合のみ処理する
-    //    if (AttackCollider.enabled && Collision.CompareTag("Enemy") && Collision.gameObject.tag != "Enemy_Search")
-    //    {
-    //        Enemy enemy = Collision.GetComponent<Enemy>();
-    //        if (enemy != null)
-    //        {
-    //            enemy.TakeDamage(PlayerPower); // EnemyHpにplayerの攻撃力分のダメージを与える
-    //            Debug.Log("Enemy Hp:" + enemy.EnemyHp); // EnemyHpの確認用
-    //        }
-    //    }
-    //}
-
-
     
     // プレイヤーがダメージを受ける処理
     public void TakeDamage()

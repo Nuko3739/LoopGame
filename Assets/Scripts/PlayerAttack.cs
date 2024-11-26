@@ -11,16 +11,11 @@ public class PlayerAttack : MonoBehaviour
 
     public float AnimationFrameDuration = 0.033f;   // フレームごとの時間（例として30FPSなら約0.033秒）
 
-
-
     public Collider2D AttackCollider;//攻撃判定のコライダー
     public float AttackCooldown = 0.45f;//攻撃のクールダウンタイム
 
-
     public Animator animator;
     private bool isCanAttack = true;
-
-
 
     private int PlayerAttackLayerIndex;//アニメーションの攻撃用レイヤーを取得するための変数
 
@@ -28,8 +23,6 @@ public class PlayerAttack : MonoBehaviour
 
     private void Start()
     {
-
-
        //Animaterコンポーネントのアサインを忘れないようにします
        if(animator == null)
         {
@@ -82,18 +75,6 @@ public class PlayerAttack : MonoBehaviour
         yield return new WaitForSeconds(AttackCooldown); // クールダウンの完了を待つ
         isCanAttack = true; // クールダウン終了後に再度攻撃可能にする
     }
-
-    //private IEnumerator EnableAttackCollider()
-    //{
-    //    AttackCollider.enabled = true; // 攻撃コライダーを有効にする
-    //    yield return new WaitForSeconds(0.1f); // 0.1秒待機(攻撃判定時間)
-    //    AttackCollider.enabled = false; // 攻撃コライダーを無効にする
-    //}
-
-    //private IEnumerator AttackCooldownCoroutine()
-    //{
-    //    yield return new WaitForSeconds(AttackCooldown); // クールダウン時間待機
-    //}
 
     // 敵にダメージを与える処理
     private void OnTriggerEnter2D(Collider2D collision)
