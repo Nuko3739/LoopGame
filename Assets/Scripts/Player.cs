@@ -1,13 +1,19 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Player : MonoBehaviour
 {
+
+    //  仮
+    private int currentScore = 10000; // 仮のスコア（後でスコアシステムから取得する）
+
+
+
     [Header("Playerの設定")]
     public int PlayerHp = 3;  // プレイヤーのHP
     //public int PlayerPower = 1; //playerの攻撃力
-
 
     [Header("移動関連の設定")]
     public float MoveSpeed = 5f;    // 移動速度
@@ -36,9 +42,11 @@ public class Player : MonoBehaviour
 
     public Transform RestartPosition;     //playerが右端に着いてから戻る場所
                                           //↑Restart位置のTransformを格納する
-    //[Header("攻撃関連の設定")]
-    //public Collider2D AttackCollider; // 攻撃判定のコライダー
-    //public float AttackCooldown = 0.5f; // 攻撃のクールダウン時間
+                                          //[Header("攻撃関連の設定")]
+                                          //public Collider2D AttackCollider; // 攻撃判定のコライダー
+                                          //public float AttackCooldown = 0.5f; // 攻撃のクールダウン時間
+
+    private ScoreManager ScoreManager;
 
     [Header("攻撃被弾：無敵時間の設定")]
     public float InvincibleDuration = 0.25f; // 無敵時間の長さ
@@ -50,6 +58,7 @@ public class Player : MonoBehaviour
         animator = GetComponent<Animator>();  // アニメーターの取得
         spriteRenderer = GetComponent<SpriteRenderer>();
 
+        ScoreManager = FindObjectOfType<ScoreManager>(); //ScoreManagerを取得
 
         rb.gravityScale = GravityScale;// Inspectorで設定できる重力をRigidbody2Dに反映
 
@@ -83,9 +92,6 @@ public class Player : MonoBehaviour
         {
             rb.gravityScale = GravityScale; // 通常の重力に戻す
         }
-
-
-       
     }
 
 
@@ -212,7 +218,6 @@ public class Player : MonoBehaviour
             return;
         }
 
-
         PlayerHp--;  // HPを減らす
         Debug.Log("Player HP: " + PlayerHp);
 
@@ -225,7 +230,29 @@ public class Player : MonoBehaviour
         if (PlayerHp <= 0)
         {
             Debug.Log("Playerがやられた！");
-            // ゲームオーバー処理などをここで追加可能
+
+            // スコアをScoreManagerから取得
+            int finalScore = 0;
+            if (ScoreManager != null)
+            {
+                finalScore = ScoreManager.GetScore(); // ScoreManagerからスコアを取得
+                //Debug.Log("ScoreManagerから取得したスコア: " + finalScore); // ここでスコアを確認
+            }
+
+            // RankingManagerを探してスコアを登録
+            RankingManager rankingManager = FindObjectOfType<RankingManager>();
+            if (rankingManager != null)
+            {
+                Debug.Log("Current Score being added: " + currentScore); // 確認用ログ
+                rankingManager.AddNewScore(finalScore); // スコアを追加
+            }
+            else
+            {
+                Debug.LogError("RankingManagerが見つかりませんでした！"); // 見つからない場合のエラーログ
+            }
+
+            // ゲームオーバーシーンに遷移
+            SceneManager.LoadScene("GameOverScene");
         }
     }
 }

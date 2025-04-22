@@ -8,11 +8,18 @@ public class ScoreManager : MonoBehaviour
     [Header("スコア関連")]
     public Text ScoreText; // スコア表示用のUI（Unity Inspectorで設定する）
     private int CurrentScore = 0; // スコアの初期値（初期値は0）
+    
 
     [Header("タイマー関連")]
     public Text TimeText; // タイム表示用のUI（Unity Inspectorで設定する）
     private float timer = 0f; // タイマーの初期値
     private bool isTiming = true; // タイマーが進行中かどうかを管理するフラグ
+
+    [Header("ランキング関連")]
+    private List<int> RankingSores = new List<int>();//ランキング用のスコアリスト
+    [Header("ゲームオーバー関連")]
+    public string GameOverSceneName = "GameOver"; // ゲームオーバーシーンの名前
+
 
     // 毎フレーム実行される処理
     private void Update()
@@ -25,12 +32,35 @@ public class ScoreManager : MonoBehaviour
         }
     }
 
-    // スコアを指定した値だけ加算するメソッド
+
+
+    // スコアを指定した値だけ【加算】して保存するメソッド
+    //ここではscoreを即座に保存する。
     public void AddScore(int amount)
     {
         CurrentScore += amount; // スコアを加算
-        UpdateScoreUI(); // スコア表示を更新
+        PlayerPrefs.SetInt("FinalScore", CurrentScore); // スコアをPlayerPrefsに保存
+        PlayerPrefs.Save(); // 保存を反映
+
+        //PlayerPrefs…保存したいものをゲームが終了しても保存するためのもの
     }
+
+
+
+    public int GetScore()
+    {
+        return CurrentScore;//現在のスコアを返す
+    }
+
+
+
+    // ゲームオーバー時に呼び出して最終スコアをPlayerPrefsに保存
+    public void SaveFinalScore()
+    {
+        PlayerPrefs.SetInt("FinalScore", CurrentScore); // スコアを保存
+        PlayerPrefs.Save(); // 保存を反映
+    }
+
 
     // タイムボーナスを計算してスコアに加算するメソッド
     public void AddTimeBonus()
@@ -83,5 +113,79 @@ public class ScoreManager : MonoBehaviour
             // 計算結果をフォーマットしてタイムUIに反映
             TimeText.text = $"TIME: {minutes:00}:{seconds:00}:{milliseconds:00}";
         }
+    }
+
+
+
+
+    ////スコアをrankingに追加し、ランキングを更新
+    //public void UpdateRanking()
+    //{
+    //    //ランキングを読み込み
+    //    LoadRanking();
+
+    //    //現在のスコアをrankingに追加
+    //    RankingSores.Add(CurrentScore);
+
+    //    //ランキングを降順にソート（高いスコア優先）
+    //    RankingSores.Sort((a, b) => b.CompareTo(a));
+
+    //    //ランキングを上位５位までに制限
+    //    if(RankingSores.Count > 5)
+    //    {
+    //        RankingSores.RemoveRange(5, RankingSores.Count - 5);
+    //    }
+
+    //    //更新したランキングを保持
+    //    SaveRanking();
+    //}
+
+    ////ランキングを保存するメソッド
+    //private void SaveRanking()
+    //{
+    //    for(int i = 0;i < RankingSores.Count; i++)
+    //    {
+    //        PlayerPrefs.SetInt($"Ranking_{i}",RankingSores[i]);
+    //    }
+    //    PlayerPrefs.Save();
+    //}
+
+    //// ランキングを読み込むメソッド
+    //private void LoadRanking()
+    //{
+    //    RankingSores.Clear();
+    //    for (int i = 0; i < 5; i++)
+    //    {
+    //        if (PlayerPrefs.HasKey($"Ranking_{i}"))
+    //        {
+    //            RankingSores.Add(PlayerPrefs.GetInt($"Ranking_{i}"));
+    //        }
+    //    }
+    //}
+
+    //// ランキングを表示用のフォーマットに変換するメソッド
+    //public string GetFormattedRanking()
+    //{
+    //    string formattedRanking = "RANKING:\n";
+    //    for (int i = 0; i < RankingSores.Count; i++)
+    //    {
+    //        formattedRanking += $"{i + 1}. {RankingSores[i]:D7}\n";
+    //    }
+    //    return formattedRanking;
+    //}
+
+    private void OnDestroy()
+    {
+        // オブジェクトが破棄されるときにスコアを保存
+        PlayerPrefs.SetInt("FinalScore", CurrentScore);
+    }
+
+
+    // スコアを保存してゲームオーバーシーンへ遷移
+    public void HandleGameOver()
+    {
+        PlayerPrefs.SetInt("FinalScore", CurrentScore); // 現在のスコアを保存
+        PlayerPrefs.Save();
+        UnityEngine.SceneManagement.SceneManager.LoadScene(GameOverSceneName); // ゲームオーバーシーンに遷移
     }
 }
