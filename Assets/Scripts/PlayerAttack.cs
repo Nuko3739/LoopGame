@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class PlayerAttack : MonoBehaviour
 {
+    private Player player; // Playerクラスの参照を取得
+
     [Header("攻撃関連の設定")]
     public int Player_TotalAttackFrames = 7;        //player攻撃アニメーションの全体フレーム数
     public int Player_ColliderEnableStartFrame = 3; //コライダーを有効にするフレーム
@@ -23,8 +25,11 @@ public class PlayerAttack : MonoBehaviour
 
     private void Start()
     {
+        //playerを参照
+        player = GetComponent<Player>();
+
        //Animaterコンポーネントのアサインを忘れないようにします
-       if(animator == null)
+       if (animator == null)
         {
             animator = GetComponent<Animator>();//自動でアサインする
         }
@@ -39,7 +44,7 @@ public class PlayerAttack : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.J) && isCanAttack) // Jキーで攻撃
+        if (Input.GetKeyDown(KeyCode.J) && isCanAttack && !player.IsDodging()) // Jキーで攻撃
         {
             StartCoroutine(Attack());//攻撃処理
         }

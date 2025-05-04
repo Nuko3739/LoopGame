@@ -11,6 +11,7 @@ public class Player : MonoBehaviour
 
 
 
+
     [Header("Playerの設定")]
     public int PlayerHp = 3;  // プレイヤーのHP
     //public int PlayerPower = 1; //playerの攻撃力
@@ -28,9 +29,21 @@ public class Player : MonoBehaviour
     public float GravityScale = 1f; // 重力の強さ
     public float AddGravityScale = 1.5f; //ジャンプ後の重力の加算
 
+    [Header("回避ステップ関連")]
+    public float StepDuration = 0.2f; // ステップの持続時間
+    public float StepCooldown = 0.5f; // ステップのクールダウン
+    private bool isDodging = false;   // ステップ中かどうか
+    private bool canDodge = true;     // ステップ可能かどうか
+
+    [Header("Sound設定")]
+    public AudioClip StepSE; 　　　　 //回避用のSE
+    private AudioSource audioSource;  //Sound再生用AudioSource
+
+
     private Rigidbody2D rb;           // 2D物理エンジンのRigidbody2D
     private SpriteRenderer spriteRenderer; // スプライトレンダラーの参照
     private Animator animator; // アニメーターの参照
+    private bool isSmallJump = false; // 小ジャンプかどうかを管理する
 
 
     private bool isGround;            // ジャンプ関連の地面判定フラグ
@@ -40,6 +53,8 @@ public class Player : MonoBehaviour
     private bool isInvincible = false; // 無敵状態かどうかのフラグ
     //private bool isCanAttack = true;     // 攻撃できるかどうかのフラグ
 
+
+    [Header("ループ設定")]
     public Transform RestartPosition;     //playerが右端に着いてから戻る場所
                                           //↑Restart位置のTransformを格納する
                                           //[Header("攻撃関連の設定")]
@@ -62,6 +77,12 @@ public class Player : MonoBehaviour
 
         rb.gravityScale = GravityScale;// Inspectorで設定できる重力をRigidbody2Dに反映
 
+        audioSource = GetComponent<AudioSource>();//回避のSound用
+        if (audioSource == null)
+        {
+            audioSource = gameObject.AddComponent<AudioSource>();
+        }
+
         //Gool処理
         //タグ名Restartを持つオブジェクトを検索して、そのTransformを取得
         GameObject RestartObject = GameObject.FindGameObjectWithTag("Restart");
@@ -83,8 +104,11 @@ public class Player : MonoBehaviour
         // プレイヤーの移動処理を呼び出し
         PlayerMove();
 
+        //プレイヤーの回避処理の呼び出し
+        PlayerStep();
+
         //空中にいるときに落下速度を速める
-        if(!isGround && rb.velocity.y < 0)
+        if (!isGround && rb.velocity.y < 0)
         {
             rb.gravityScale = GravityScale * AddGravityScale; // 落下時の重力を強化
         }
@@ -92,6 +116,8 @@ public class Player : MonoBehaviour
         {
             rb.gravityScale = GravityScale; // 通常の重力に戻す
         }
+
+        
     }
 
 
@@ -120,6 +146,8 @@ public class Player : MonoBehaviour
     // プレイヤーの移動処理をメソッドに分離
     private void PlayerMove()
     {
+        if (isDodging) return; // ステップ中は何もしない
+
         // WASD移動
         float moveX = Input.GetAxisRaw("Horizontal");
         rb.velocity = new Vector2(moveX * MoveSpeed, rb.velocity.y);
@@ -136,14 +164,19 @@ public class Player : MonoBehaviour
         // ↑ animator.SetBool("isRunning", moveX != 0);
 
         // 左右のキー入力に応じてキャラクターの向きを変更
-        if (moveX > 0 && !isFacingRight)
+        //　空中にいるときは向きを変えない
+        if (isGround || Input.GetKey(KeyCode.J)) // 地面にいるか、攻撃していたら反転許可
         {
-            Flip();
+            if (moveX > 0 && !isFacingRight)
+            {
+                Flip();
+            }
+            else if (moveX < 0 && isFacingRight)
+            {
+                Flip();
+            }
         }
-        else if (moveX < 0 && isFacingRight)
-        {
-            Flip();
-        }
+
 
         // ジャンプ処理
         if (Input.GetKeyDown(KeyCode.Space) && isGround)
@@ -151,6 +184,8 @@ public class Player : MonoBehaviour
             isJumping = true;
             JumpTimeCounter = MaxJumpHoldTimm;
             rb.velocity = new Vector2(rb.velocity.x, MinJumpForce); // 最小ジャンプ力を設定
+
+            isSmallJump = true; // 最初は小ジャンプと仮定しておく
         }
 
         // ジャンプボタンを押し続けている場合
@@ -159,21 +194,121 @@ public class Player : MonoBehaviour
             if (JumpTimeCounter > 0)
             {
                 rb.velocity = new Vector2(rb.velocity.x, JumpForce); // 最大ジャンプ力まで加算
-                //JumpTimeCounter -= Time.deltaTime; // 押している時間を計測
+                                                                     //JumpTimeCounter -= Time.deltaTime; // 押している時間を計測
                 JumpTimeCounter -= Time.deltaTime * 1.5f;  // 減少速度を速めて上昇時間を短縮
+
+                // 長押しされたら小ジャンプではないと判定
+                if (JumpTimeCounter < MaxJumpHoldTimm * 0.7f) // 70%以上押したら大ジャンプ判定
+                {
+                    isSmallJump = false;
+                }
             }
             else
             {
-                isJumping = false;//ホバリング抑止
+                isJumping = false; // ホバリング抑止
             }
         }
 
         // ジャンプボタンを離した場合
         if (Input.GetKeyUp(KeyCode.Space))
         {
-            isJumping = false;//ホバリング抑止
+            isJumping = false; // ホバリング抑止
+        }
+
+
+
+
+
+        // --- ここからアニメーション制御 ---
+
+        // ジャンプのアニメーション
+        if (!isGround)
+        {
+            if (isSmallJump)
+            {
+                animator.SetBool("isSmallJump", true); // 小ジャンプアニメを再生
+                animator.SetBool("isJumping", false);
+            }
+            else
+            {
+                animator.SetBool("isJumping", true); // 通常ジャンプアニメを再生
+                animator.SetBool("isSmallJump", false);
+            }
+        }
+        else
+        {
+            // 地面に着いたらリセット
+            animator.SetBool("isJumping", false);
+            animator.SetBool("isSmallJump", false);
         }
     }
+
+    //回避ステップのメソッド
+    private void PlayerStep()
+    {
+        // ステップ入力処理（Lキー）
+        if (Input.GetKeyDown(KeyCode.L) && canDodge && !isDodging && isGround)
+        {
+            StartCoroutine(DodgeStep());
+        }
+    }
+
+    //ステップ処理のコルーチン
+    private IEnumerator DodgeStep()
+    {
+        animator.SetBool("isDodging", true);
+        // ステップ終わりに
+        
+        animator.Update(0); // 即座にアニメーション状態を反映
+        // ステップSE再生
+        if (StepSE != null)
+        {
+            audioSource.PlayOneShot(StepSE);
+        }
+
+        isDodging = true;
+        canDodge = false;
+        isInvincible = true;
+
+        float stepDirection = isFacingRight ? 1f : -1f;
+
+        
+        // 点滅演出をスタート
+        StartCoroutine(DodgeBlinkCoroutine());
+
+        // ステップ移動
+        rb.velocity = new Vector2(stepDirection * MoveStep / StepDuration, 0f);
+
+        yield return new WaitForSeconds(StepDuration);
+
+        animator.SetBool("isDodging", false);
+
+        // 終了処理
+        rb.velocity = Vector2.zero;
+        isDodging = false;
+        isInvincible = false;
+
+        yield return new WaitForSeconds(StepCooldown);
+        canDodge = true;
+    }
+
+    //回避ステップの青点滅
+    private IEnumerator DodgeBlinkCoroutine()
+    {
+        while (isDodging)
+        {
+            // 青く点滅（描画ON/OFFではなく色変化で明示的に青系に）
+            spriteRenderer.color = Color.cyan;
+            yield return new WaitForSeconds(0.05f); // 50ミリ秒 ON
+
+            spriteRenderer.color = new Color(0.3f, 0.3f, 1f); // 少し薄い青
+            yield return new WaitForSeconds(0.05f); // 50ミリ秒 OFF風（別の青）
+        }
+
+        // ステップが終わったら色を戻す
+        spriteRenderer.color = Color.white;
+    }
+
 
     // キャラクターの向きを反転させるメソッド
     private void Flip()
@@ -254,5 +389,16 @@ public class Player : MonoBehaviour
             // ゲームオーバーシーンに遷移
             SceneManager.LoadScene("GameOverScene");
         }
+    }
+
+    // ステップ中かどうかを他スクリプトから参照する用
+    public bool IsDodging()
+    {
+        return isDodging;
+    }
+    // プレイヤーが右を向いているかを他スクリプトから参照する用
+    public bool IsFacingRight()
+    {
+        return isFacingRight;
     }
 }

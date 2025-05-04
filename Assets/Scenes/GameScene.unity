@@ -1093,6 +1093,71 @@ Transform:
   m_Children: []
   m_Father: {fileID: 2096564912}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &802885004
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: -2253911629886400664, guid: 1c16510852b990f48b2663de8a1c34f6, type: 3}
+      propertyPath: m_Name
+      value: Weapons
+      objectReference: {fileID: 0}
+    - target: {fileID: 7878350319992209165, guid: 1c16510852b990f48b2663de8a1c34f6, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 3.6
+      objectReference: {fileID: 0}
+    - target: {fileID: 7878350319992209165, guid: 1c16510852b990f48b2663de8a1c34f6, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 3.6
+      objectReference: {fileID: 0}
+    - target: {fileID: 7878350319992209165, guid: 1c16510852b990f48b2663de8a1c34f6, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 3.6819801
+      objectReference: {fileID: 0}
+    - target: {fileID: 7878350319992209165, guid: 1c16510852b990f48b2663de8a1c34f6, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -1.8343356
+      objectReference: {fileID: 0}
+    - target: {fileID: 7878350319992209165, guid: 1c16510852b990f48b2663de8a1c34f6, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7878350319992209165, guid: 1c16510852b990f48b2663de8a1c34f6, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7878350319992209165, guid: 1c16510852b990f48b2663de8a1c34f6, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7878350319992209165, guid: 1c16510852b990f48b2663de8a1c34f6, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7878350319992209165, guid: 1c16510852b990f48b2663de8a1c34f6, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7878350319992209165, guid: 1c16510852b990f48b2663de8a1c34f6, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7878350319992209165, guid: 1c16510852b990f48b2663de8a1c34f6, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7878350319992209165, guid: 1c16510852b990f48b2663de8a1c34f6, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: -8435245712485981826, guid: 1c16510852b990f48b2663de8a1c34f6, type: 3}
 --- !u!1 &810929544
 GameObject:
   m_ObjectHideFlags: 0
@@ -2703,16 +2768,24 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 9100000, guid: ed687d043cc05094b981f8f3d1948ecf, type: 2}
     - target: {fileID: 1250295480328313883, guid: a9b8b6b5da0cb3a47883d29b0f838125, type: 3}
+      propertyPath: StepSE
+      value: 
+      objectReference: {fileID: 8300000, guid: 7d332ea166566304fa48e2956635adbc, type: 3}
+    - target: {fileID: 1250295480328313883, guid: a9b8b6b5da0cb3a47883d29b0f838125, type: 3}
       propertyPath: JumpForce
-      value: 6
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 1250295480328313883, guid: a9b8b6b5da0cb3a47883d29b0f838125, type: 3}
       propertyPath: MoveSpeed
-      value: 15
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 1250295480328313883, guid: a9b8b6b5da0cb3a47883d29b0f838125, type: 3}
       propertyPath: PlayerPower
       value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 1250295480328313883, guid: a9b8b6b5da0cb3a47883d29b0f838125, type: 3}
+      propertyPath: GravityScale
+      value: 1.5
       objectReference: {fileID: 0}
     - target: {fileID: 1250295480328313883, guid: a9b8b6b5da0cb3a47883d29b0f838125, type: 3}
       propertyPath: MinJumpForce
@@ -2727,8 +2800,12 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 799386419}
     - target: {fileID: 1250295480328313883, guid: a9b8b6b5da0cb3a47883d29b0f838125, type: 3}
+      propertyPath: AddGravityScale
+      value: 2.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1250295480328313883, guid: a9b8b6b5da0cb3a47883d29b0f838125, type: 3}
       propertyPath: MaxJumpHoldTimm
-      value: 0.5
+      value: 0.45
       objectReference: {fileID: 0}
     - target: {fileID: 1250295480328313883, guid: a9b8b6b5da0cb3a47883d29b0f838125, type: 3}
       propertyPath: RestartPosition
@@ -2826,3 +2903,4 @@ SceneRoots:
   - {fileID: 2073985332}
   - {fileID: 1053808471}
   - {fileID: 1147379762}
+  - {fileID: 802885004}
